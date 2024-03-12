@@ -1,6 +1,17 @@
 
 #include "sandbox.h"
-void CreateBMP(char* output_path, FieldManager my_field, uint64_t** mas) {
+
+int GetColore(int value){
+    if (value > 3){
+        return 4;   // TODO: make not vzhux
+    }
+    else{
+        return value;
+    }
+}
+
+
+void CreateBMP(char* output_path, FieldManager& my_field, uint64_t** mas) {
   BITMAPFILEHEADER bmp_file_header;
   BITMAPINFOHEADER bmp_info_header;
 
@@ -27,9 +38,9 @@ void CreateBMP(char* output_path, FieldManager my_field, uint64_t** mas) {
   Palette[3].rgbBlue = 255;
   //black
   for(int i = 4; i < 16; i++) {
-    Palette[4].rgbRed = 0;
-    Palette[4].rgbGreen = 0;
-    Palette[4].rgbBlue = 0;
+    Palette[i].rgbRed = 0;
+    Palette[i].rgbGreen = 0;
+    Palette[i].rgbBlue = 0;
   }
 
 
@@ -52,7 +63,7 @@ void CreateBMP(char* output_path, FieldManager my_field, uint64_t** mas) {
   for (int i = my_field.y_min; i <= my_field.y_max; ++i) {
 
     for (int j = my_field.x_min; j <= my_field.x_max; j+=2) {
-      uint8_t byte_for_2_pix = ((mas[i-my_field.y_min][j-my_field.x_min] % 16) << 4 | mas[i - my_field.y_min][j+1 - my_field.x_min] % 16);
+      uint8_t byte_for_2_pix = (GetColore(mas[i-my_field.y_min][j-my_field.x_min]) << 4 | GetColore(mas[i - my_field.y_min][j+1 - my_field.x_min]));
       output_file.write(reinterpret_cast <char*> (&byte_for_2_pix), sizeof(byte_for_2_pix));
     }
     for (int a = 0; a < ( (4-(my_field.width/2)%4) %4); ++a) {

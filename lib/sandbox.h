@@ -45,7 +45,7 @@ struct Queue {
 
 
 struct FieldManager {
-    uint64_t* mas;
+    uint64_t *mas;
     uint16_t height;
     uint16_t width;
     uint32_t size;
@@ -66,10 +66,20 @@ struct FieldManager {
 
     Queue NextQueue(Queue &prev_queue);
 
-    void CheckExtension(Node* cell);
+    void CheckExtension(Node *cell);
+
+    ~FieldManager() {
+        delete[] mas;
+    }
+
+    FieldManager();
+
+    FieldManager(const FieldManager& other);
+
+    FieldManager& operator=(const FieldManager& other);
 };
 
-FieldManager ReadFromTSV(const char* path);
+FieldManager& ReadFromTSV(const char* path);
 
 ///------------------------------DRAW CONTROL-------------------------------------
 
@@ -104,7 +114,7 @@ struct RGBQUAD {
     uint8_t rgbReserved = 0;
 };
 
-void CreateBMP(char* output_path, FieldManager my_vector, uint64_t** mas);
+void CreateBMP(char* output_path, FieldManager& my_vector, uint64_t** mas);
 
 ///----------------------------ARGUMENT PARSER--------------------------------------
 
@@ -132,6 +142,7 @@ char* GetFileName(int iter);
 uint64_t** ArrayConvert(uint64_t* mas, uint16_t width, uint16_t height);
 char* ToString(int number);
 void StartModel(ProgramParameters &Arguments);
+int GetColore(int value);
 
 
 #endif //LABWORK3_CLOSEDCANDIES_SANDBOX_H
