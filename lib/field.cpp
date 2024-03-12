@@ -1,43 +1,43 @@
 #include "sandbox.h"
 
-FieldManager ReadFromTSV(const char* path) {
+FieldManager& ReadFromTSV(const char* path) {
   std::ifstream TSVFile(path, std::ios::binary);
   if(!TSVFile.is_open())
     InputError();
 
-  FieldManager my_field;
+  FieldManager *my_field = new FieldManager();
   int16_t x,y;
   uint64_t number;
 
   while(!TSVFile.eof()) {
     TSVFile >> y >> x >> number;
-    if(x > my_field.x_max) my_field.x_max = x;
-    if(x < my_field.x_min) my_field.x_min = x;
-    if(y > my_field.y_max) my_field.y_max = y;
-    if(y < my_field.y_min) my_field.y_min = y;
+    if(x > my_field->x_max) my_field->x_max = x;
+    if(x < my_field->x_min) my_field->x_min = x;
+    if(y > my_field->y_max) my_field->y_max = y;
+    if(y < my_field->y_min) my_field->y_min = y;
   }
   TSVFile.close();
 
-  if((my_field.x_max - my_field.x_min + 1) % 2 == 1) {
-    my_field.x_max++;
+  if((my_field->x_max - my_field->x_min + 1) % 2 == 1) {
+    my_field->x_max++;
   }
 
-  my_field.width = my_field.x_max - my_field.x_min + 1;
-  my_field.height = my_field.y_max - my_field.y_min + 1;
-  my_field.size = my_field.width * my_field.height;
+  my_field->width = my_field->x_max - my_field->x_min + 1;
+  my_field->height = my_field->y_max - my_field->y_min + 1;
+  my_field->size = my_field->width * my_field->height;
 
-  my_field.mas = new uint64_t[my_field.size];
-  for(uint32_t i = 0; i < my_field.size; ++i) {
-    my_field.mas[i] = 0;
+  my_field->mas = new uint64_t[my_field->size];
+  for(uint32_t i = 0; i < my_field->size; ++i) {
+    my_field->mas[i] = 0;
   }
 
   TSVFile.open(path, std::ios::binary);
   while(!TSVFile.eof()) {
     TSVFile >> y >> x >> number;
-    my_field.mas[my_field.width * (y - my_field.y_min) + (x - my_field.x_min)] = number;
+    my_field->mas[my_field->width * (y - my_field->y_min) + (x - my_field->x_min)] = number;
   }
 
-  return my_field;
+  return *my_field;
 }
 
 void FieldManager::AddToTop() {
@@ -112,7 +112,7 @@ void Queue::Push(uint64_t value, int16_t y, int16_t x) {
 
 void Queue::Pop() {
   if (IsEmpty()) {
-    std::cout <<  "ПУсто";
+    std::cerr << "Empty";
     return;
   }
   Node* saved = head;
@@ -197,11 +197,9 @@ Queue FieldManager::NextQueue(Queue &prev_queue) {
       next_queue.Push(cell->value, cell->y, cell->x);
     }
 
-
     prev_queue.Pop();
-
   }
-  //next_queue.Print();
+
   return next_queue;
 }
 
@@ -220,4 +218,44 @@ void FieldManager::CheckExtension(Node* cell) {
     AddToLeft();
     AddToLeft();
   }
+}
+
+
+FieldManager::FieldManager(const FieldManager &other) {
+   this->width = other.width;
+   this->size = other.size;
+   this->height = other.height;
+   this->x_min = other.x_min;
+   this->y_min = other.y_min;
+   this->x_max = other.x_max;
+   this->y_max = other.y_max;
+   this->mas = new uint64_t[this->size];
+   for (int i = 0; i < this->size; i++){
+       this->mas[i] = other.mas[i];
+   }
+}
+
+
+FieldManager& FieldManager::operator=(const FieldManager& other) {
+    if (this == &other)
+        return *this;
+
+    delete[] mas;
+    size = other.size;
+    height = other.height;
+    width = other.width;
+    x_max = other.x_max;
+    x_min = other.x_min;
+    y_max = other.y_max;
+    y_min = other.x_min;
+    mas = new uint64_t[other.size];
+    for (size_t i = 0; i < other.size; ++i)
+        mas[i] = other.mas[i];
+
+    return *this;
+}
+
+
+FieldManager::FieldManager() {
+
 }

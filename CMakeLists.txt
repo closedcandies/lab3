@@ -7,6 +7,8 @@ project(
 )
 
 set(CMAKE_CXX_STANDARD 17)
+add_link_options(-fsanitize=address)
+
 add_executable(labwork3-closedcandies main.cpp
         lib/sandbox.h
         lib/drawer.cpp

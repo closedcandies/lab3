@@ -1,6 +1,11 @@
 #include "sandbox.h"
 
 char* ToString(int number) {
+    if (number == 0){
+        char* result = new char[1];
+        result[0] = '0';
+        return result;
+    }
   int number1 = number;
   int8_t pow = 0;
 
@@ -22,15 +27,19 @@ char* ToString(int number) {
 
 char* GetFileName(int iter) {
   char* number = ToString(iter);
-  size_t size = strlen(number) + strlen(".bmp");
+  size_t len = 0;
+  while (number[len] != '\0'){
+      len++;
+  }
+  size_t size = len + strlen(".bmp");
   char* result = new char[size];
   size_t i = 0;
 
-  for(i; i < strlen(number); ++i){
+  for(i; i < len; ++i){
     result[i] = number[i];
   }
   for(i; i < size; ++i) {
-    result[i] = ".bmp"[i-strlen(number)];
+    result[i] = ".bmp"[i-len];
   }
   delete number;
   return result;
@@ -69,8 +78,12 @@ void StartModel(ProgramParameters &Arguments) {
       if(counter_iter % Arguments.freq == 0) {
         char* temp = new char[200];
         strcpy(temp,Arguments.output_path);
-        strcat(temp, GetFileName(counter_iter/Arguments.freq));
+        char* filename = GetFileName(counter_iter/Arguments.freq);
+        strcat(temp, filename);
         CreateBMP(temp, my_field, ArrayConvert(my_field.mas, my_field.width,my_field.height));
+        delete[] filename;
+        delete[] temp;
+        filename = nullptr, temp = nullptr;
       }
       counter_iter++;
       bmp_counter++;
@@ -82,9 +95,13 @@ void StartModel(ProgramParameters &Arguments) {
       counter_iter++;
       char* temp = new char[200];
       strcpy(temp,Arguments.output_path);
-      strcat(temp, GetFileName(counter_iter/Arguments.freq));
+      char* filename = GetFileName(counter_iter/Arguments.freq);
+      strcat(temp, filename);
       CreateBMP(temp, my_field, ArrayConvert(my_field.mas, my_field.width,my_field.height));
+      delete[] temp;
+      delete[] filename;
     }
 
   }
+
 }
