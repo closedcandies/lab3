@@ -73,7 +73,7 @@ void StartModel(ProgramParameters &Arguments) {
     }
     CreateBMP(strcat(Arguments.output_path, "1.bmp"), my_field, ArrayConvert(my_field.mas,my_field.width, my_field.height));
   } else {
-    while(!queue.IsEmpty() and counter_iter < Arguments.max_iterations) {
+    do {
       queue = my_field.NextQueue(queue);
       if(counter_iter % Arguments.freq == 0) {
         char* temp = new char[200];
@@ -87,7 +87,7 @@ void StartModel(ProgramParameters &Arguments) {
       }
       counter_iter++;
       bmp_counter++;
-    }
+    } while(!queue.IsEmpty() and counter_iter < Arguments.max_iterations);
     if(counter_iter >= Arguments.max_iterations) {
       while(!queue.IsEmpty()) {
         queue = my_field.NextQueue(queue);
