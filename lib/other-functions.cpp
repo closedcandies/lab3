@@ -25,24 +25,8 @@ char* ToString(int number) {
   return result;
 }
 
-char* GetFileName(int iter) {
-  char* number = ToString(iter);
-  size_t len = 0;
-  while (number[len] != '\0'){
-      len++;
-  }
-  size_t size = len + strlen(".bmp");
-  char* result = new char[size];
-  size_t i = 0;
-
-  for(i; i < len; ++i){
-    result[i] = number[i];
-  }
-  for(i; i < size; ++i) {
-    result[i] = ".bmp"[i-len];
-  }
-  delete number;
-  return result;
+std::string GetFileName(int iter) {
+  return std::to_string(iter);
 }
 
 uint64_t** ArrayConvert(uint64_t* mas, uint16_t width, uint16_t height) {
@@ -62,46 +46,59 @@ uint64_t** ArrayConvert(uint64_t* mas, uint16_t width, uint16_t height) {
 
 void StartModel(ProgramParameters &Arguments) {
   FieldManager my_field = ReadFromTSV(Arguments.input_path);
-  Queue queue = my_field.GetQueue();
+  std::cout << &my_field << std::endl;
+  my_field.GetQueue();
+  std::cout << my_field.height << " " << my_field.width << " " << my_field.size << " "<< my_field.y_max << " " << my_field.y_min << " " << my_field.x_max << " " << my_field.x_min << std::endl;
 
   uint64_t counter_iter = 0;
   uint64_t bmp_counter = 1;
-
+  uint64_t** my_mas;
   if(Arguments.max_iterations == 0 or Arguments.freq == 0) {
-    while(!queue.IsEmpty()) {
-      queue = my_field.NextQueue(queue);
+    while(!my_field.first_queue->IsEmpty()) {
+      my_field.NextQueue();
     }
-    CreateBMP(strcat(Arguments.output_path, "1.bmp"), my_field, ArrayConvert(my_field.mas,my_field.width, my_field.height));
+    my_mas = ArrayConvert(my_field.mas, my_field.width, my_field.height);
+    CreateBMP(std::string(Arguments.output_path) + "1.bmp", my_field, my_mas);
+    for(uint16_t i = 0; i < my_field.height; ++i) {
+      delete[] my_mas[i];
+    }
+    delete[] my_mas;
   } else {
     do {
-      queue = my_field.NextQueue(queue);
+      my_field.NextQueue();
       if(counter_iter % Arguments.freq == 0) {
-        char* temp = new char[200];
-        strcpy(temp,Arguments.output_path);
-        char* filename = GetFileName(counter_iter/Arguments.freq);
-        strcat(temp, filename);
-        CreateBMP(temp, my_field, ArrayConvert(my_field.mas, my_field.width,my_field.height));
-        delete[] filename;
-        delete[] temp;
-        filename = nullptr, temp = nullptr;
+        std::string path{Arguments.output_path};
+
+        std::string filename = GetFileName(counter_iter/Arguments.freq);
+        path += filename;
+        std::cout << path << std::endl;
+        my_mas = ArrayConvert(my_field.mas, my_field.width, my_field.height);
+        CreateBMP(path + ".bmp", my_field, my_mas);
+        for(uint16_t i = 0; i < my_field.height; ++i) {
+          delete[] my_mas[i];
+        }
+        delete[] my_mas;
       }
       counter_iter++;
       bmp_counter++;
-    } while(!queue.IsEmpty() and counter_iter < Arguments.max_iterations);
-    if(counter_iter >= Arguments.max_iterations) {
-      while(!queue.IsEmpty()) {
-        queue = my_field.NextQueue(queue);
+      std::cout << counter_iter << std::endl;
+    } while(!my_field.first_queue->IsEmpty() and counter_iter < Arguments.max_iterations);
+    if (counter_iter >= Arguments.max_iterations) {
+      while(!my_field.first_queue->IsEmpty()) {
+        my_field.NextQueue();
       }
       counter_iter++;
-      char* temp = new char[200];
-      strcpy(temp,Arguments.output_path);
-      char* filename = GetFileName(counter_iter/Arguments.freq);
-      strcat(temp, filename);
-      CreateBMP(temp, my_field, ArrayConvert(my_field.mas, my_field.width,my_field.height));
-      delete[] temp;
-      delete[] filename;
+      std::string temp{Arguments.output_path};
+      std::string filename = GetFileName(counter_iter/Arguments.freq);
+      temp += filename;
+      std::cout << temp << std::endl;
+      my_mas = ArrayConvert(my_field.mas, my_field.width, my_field.height);
+      CreateBMP(temp, my_field, my_mas);
+     for(uint16_t i = 0; i < my_field.height; ++i) {
+       delete[] my_mas[i];
+     }
+      delete[] my_mas;
     }
-
   }
 
 }

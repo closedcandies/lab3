@@ -11,7 +11,7 @@ int GetColore(int value){
 }
 
 
-void CreateBMP(char* output_path, FieldManager& my_field, uint64_t** mas) {
+void CreateBMP(const std::string& output_path, FieldManager& my_field, uint64_t** mas) {
   BITMAPFILEHEADER bmp_file_header;
   BITMAPINFOHEADER bmp_info_header;
 
@@ -42,7 +42,6 @@ void CreateBMP(char* output_path, FieldManager& my_field, uint64_t** mas) {
     Palette[i].rgbGreen = 0;
     Palette[i].rgbBlue = 0;
   }
-
 
   bmp_file_header.bfType = 0x4D42;
   bmp_file_header.bfOffBits = sizeof(bmp_file_header) + sizeof(bmp_info_header) + sizeof(Palette);

@@ -6,8 +6,8 @@ void InputError() {
 }
 
 void CheckArguments(ProgramParameters& Arguments) {
-  if (Arguments.input_path == ""
-      or Arguments.output_path == "") {
+  if (strcmp(Arguments.input_path, "") == 0
+      or strcmp(Arguments.output_path, "") == 0) {
     InputError();
   } else {
     std::cout << Arguments.input_path << " " << Arguments.output_path << " max iter = " <<

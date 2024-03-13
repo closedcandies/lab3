@@ -6,7 +6,8 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
-
+#include <limits>
+#include <string>
 ///---------------------------FIELD CONTROL---------------------------------
 
 struct Node {
@@ -25,12 +26,16 @@ struct Node {
 
 struct Queue {
     Node* head;
-    Node* tail;
+    Node* tail = nullptr;
 
     Queue() {
         head = nullptr;
         tail = nullptr;
     }
+
+    Queue(const Queue& other);
+    ~Queue();
+    Queue& operator=(const Queue& other);
 
     void Push(uint64_t value, int16_t y , int16_t x);
 
@@ -38,9 +43,11 @@ struct Queue {
 
     Node* GetNode();
 
-    bool IsEmpty();
+    bool IsEmpty() const;
 
     void Print();
+
+
 };
 
 
@@ -53,6 +60,8 @@ struct FieldManager {
     int16_t x_min = INT16_MAX;
     int16_t y_max = INT16_MIN;
     int16_t y_min = INT16_MAX;
+    Queue* first_queue;
+    Queue* second_queue;
 
     void AddToBottom();
 
@@ -62,24 +71,25 @@ struct FieldManager {
 
     void AddToLeft();
 
-    Queue GetQueue();
+    void GetQueue();
 
-    Queue NextQueue(Queue &prev_queue);
+    void NextQueue();
 
     void CheckExtension(Node *cell);
 
     ~FieldManager() {
+        std::cout << this << std::endl;
         delete[] mas;
     }
 
-    FieldManager();
+    FieldManager() = default;
 
     FieldManager(const FieldManager& other);
 
     FieldManager& operator=(const FieldManager& other);
 };
 
-FieldManager& ReadFromTSV(const char* path);
+FieldManager ReadFromTSV(const char* path);
 
 ///------------------------------DRAW CONTROL-------------------------------------
 
@@ -114,16 +124,16 @@ struct RGBQUAD {
     uint8_t rgbReserved = 0;
 };
 
-void CreateBMP(char* output_path, FieldManager& my_vector, uint64_t** mas);
+void CreateBMP(const std::string& output_path, FieldManager& my_vector, uint64_t** mas);
 
 ///----------------------------ARGUMENT PARSER--------------------------------------
 
 struct ProgramParameters {
     char* input_path;
     char* output_path = "";
-    uint64_t max_iterations;
+    uint64_t max_iterations = std::numeric_limits<uint64_t>::max();
     bool max_iterations_flag = false;
-    uint64_t freq;
+    uint64_t freq = 1;
     bool freq_flag = false;
 };
 
@@ -138,7 +148,7 @@ void ParseArguments(char *argv[], int argc, ProgramParameters& Arguments);
 
 ///--------------------------OTHER FUNCTIONS----------------------------------------
 
-char* GetFileName(int iter);
+std::string GetFileName(int iter);
 uint64_t** ArrayConvert(uint64_t* mas, uint16_t width, uint16_t height);
 char* ToString(int number);
 void StartModel(ProgramParameters &Arguments);
