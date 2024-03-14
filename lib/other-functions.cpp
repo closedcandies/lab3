@@ -93,7 +93,7 @@ void StartModel(ProgramParameters &Arguments) {
       temp += filename;
       std::cout << temp << std::endl;
       my_mas = ArrayConvert(my_field.mas, my_field.width, my_field.height);
-      CreateBMP(temp, my_field, my_mas);
+      CreateBMP(temp + ".bmp", my_field, my_mas);
      for(uint16_t i = 0; i < my_field.height; ++i) {
        delete[] my_mas[i];
      }

@@ -6,8 +6,7 @@ void InputError() {
 }
 
 void CheckArguments(ProgramParameters& Arguments) {
-  if (strcmp(Arguments.input_path, "") == 0
-      or strcmp(Arguments.output_path, "") == 0) {
+  if (!Arguments.input_correct or !Arguments.output_correct) {
     InputError();
   } else {
     std::cout << Arguments.input_path << " " << Arguments.output_path << " max iter = " <<
@@ -27,6 +26,7 @@ void ParseArguments(char *argv[], int argc, ProgramParameters& Arguments) {
 
       Arguments.input_path = argv[i+1];
       std::ifstream file(Arguments.input_path);
+      Arguments.input_correct = true;
       ++i;
       if (!file.is_open())
         InputError();
@@ -36,6 +36,7 @@ void ParseArguments(char *argv[], int argc, ProgramParameters& Arguments) {
       char* new_st = (st+strlen(st_input));
       Arguments.input_path = new_st;
       std::ifstream file(Arguments.input_path);
+      Arguments.input_correct = true;
 
       if (!file.is_open())
         InputError();
@@ -47,7 +48,7 @@ void ParseArguments(char *argv[], int argc, ProgramParameters& Arguments) {
 
       Arguments.output_path = argv[i+1];
       ++i;
-
+      Arguments.output_correct = true;
 
       if (!std::filesystem::is_directory(Arguments.output_path))
         InputError();
@@ -58,6 +59,7 @@ void ParseArguments(char *argv[], int argc, ProgramParameters& Arguments) {
       char* new_st = (st+strlen(st_output));
       Arguments.output_path = new_st;
 
+      Arguments.output_correct = true;
       if (!std::filesystem::is_directory(Arguments.output_path))
         InputError();
     }

@@ -130,7 +130,9 @@ void CreateBMP(const std::string& output_path, FieldManager& my_vector, uint64_t
 
 struct ProgramParameters {
     char* input_path;
+    bool input_correct = false;
     char* output_path = "";
+    bool output_correct = false;
     uint64_t max_iterations = std::numeric_limits<uint64_t>::max();
     bool max_iterations_flag = false;
     uint64_t freq = 1;
